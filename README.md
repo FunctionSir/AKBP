@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-15 00:49:57
+ * @LastEditTime: 2023-07-15 00:51:42
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -83,4 +83,5 @@ pic: 附加图片(应以base64形式发送)
 aud: 附加声音(应以base64形式发送)  
 vid: 附加视频(应以base64形式发送)  
 octet: 其他要附加的二进制数据(格式如下)  
-...&octet=文件名{base64形式的数据} 注意:文件名中最好包含扩展名, 大括号应保留.  
+...&octet=文件名{base64形式的数据}  
+注意:文件名中最好包含扩展名, 大括号应保留.  
