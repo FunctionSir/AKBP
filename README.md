@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-15 00:51:42
+ * @LastEditTime: 2023-07-16 01:33:16
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -70,6 +70,10 @@ key: 信标的UUID对应的Key.
 sid: 会话ID(同一个ID则会被认为是对上次发送内容的补充, 应为整数, 且递增)  
 eid: 事件ID(若两个请求ID相同, 则会被认为实在同一个事件中, 比如同一次绑架, 应为字符串)  
 
+## 时间类
+
+ts: Unix timestamp(应使用秒为单位)
+
 ## 地理位置类
 
 lat: 纬度(应使用WGS-84坐标系, 以正负十进制度表示)  
@@ -80,8 +84,6 @@ alt: 海拔(单位应为米)
 
 txt: 附加文字信息  
 pic: 附加图片(应以base64形式发送)  
-aud: 附加声音(应以base64形式发送)  
-vid: 附加视频(应以base64形式发送)  
 octet: 其他要附加的二进制数据(格式如下)  
 ...&octet=文件名{base64形式的数据}  
 注意:文件名中最好包含扩展名, 大括号应保留.  
