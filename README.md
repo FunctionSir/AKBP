@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-16 01:33:16
+ * @LastEditTime: 2023-07-17 00:51:04
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -67,7 +67,7 @@ key: 信标的UUID对应的Key.
 
 ## 事件标识类
 
-sid: 会话ID(同一个ID则会被认为是对上次发送内容的补充, 应为整数, 且递增)  
+sid: 会话ID(同一个ID则会被认为是对上次发送内容的补充, 应为递增的整数.)  
 eid: 事件ID(若两个请求ID相同, 则会被认为实在同一个事件中, 比如同一次绑架, 应为字符串)  
 
 ## 时间类

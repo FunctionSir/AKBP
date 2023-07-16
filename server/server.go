@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-16 01:26:50
+ * @LastEditTime: 2023-07-17 00:42:30
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -30,12 +30,14 @@ var (
 	ProgName    string = ""                    //Program name in os.Args[:].
 	Port        int    = DEFAULT_PORT          //Server port.
 	RcvrLogFile string = DEFAULT_RCVR_LOG_FILE //RcvrLog file.
+	API_VER_AVL        = [...]string{"APIv1"}  // API version(s) available.
 )
 
 func err_handle(where string, err error) {
 	fmt.Println(time.Now().String() + " Error occurred at " + where + ": " + err.Error() + ".")
 }
 
+// The os.Args parser.
 func args_parser() {
 	var i int
 	ProgName = os.Args[0]
@@ -49,6 +51,8 @@ func args_parser() {
 			} else {
 				err_handle("main.args_parser", err)
 			}
+		case "-r", "--rcvr-log":
+			RcvrLogFile = os.Args[i+1]
 		}
 	}
 }
@@ -68,9 +72,19 @@ func initial() {
 	fmt.Println(SPLIT_LINE)
 }
 
-// HTTP Server
+// Feel free to customize it!
+func default_handler(w http.ResponseWriter, r *http.Request) {
+	_ = r // Don't need var "r" in this ver.
+	fmt.Fprintln(w, "This is an [A]nti [K]idnapping [B]eacon [P]roject Server.")
+	fmt.Fprintln(w, "ServerVersion: "+VER+", CodeName: "+CODE_NAME)
+	fmt.Fprintln(w, "!WARNING! !THIS SOFTWARE IS UNDER DEVELOPING AND SHOULD NOT BE USED IN ANY FORMAL SERVERS! !WARNING!") // Remove after the developments.
+	fmt.Fprintln(w, "!WARNING! !ANY PACKAGE SENT TO HERE MAY NOT BE HANDLE CORRECTLY! !WARNING!")                           // Remove after the developments.
+	fmt.Fprintln(w, "API Version(s) Available: "+strings.Join(API_VER_AVL[:], ", "))
+}
+
+// HTTP(S) Server.
 func http_server() {
-	//http.HandleFunc("/", nil) //Developing
+	http.HandleFunc("/", default_handler)
 	http.HandleFunc("/v1/", Apiv1_handler)
 	http.ListenAndServe(":"+strconv.Itoa(Port), nil)
 }
