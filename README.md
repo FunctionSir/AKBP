@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-18 02:12:31
+ * @LastEditTime: 2023-07-18 02:37:33
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -85,7 +85,7 @@ alt: 海拔(单位应为米)
 msg: 附加纯文本短信(但其实也可以是"长信")  
 img: 附加图像(应以base64形式发送)  
 注意: 应为可直接在img标签内显示出来的格式, 如下:  
-data:image/***;base64,xxxxxx
+data:image/***;base64,xxxxxx  
 file: 其他要附加的文件(格式如下)  
 ...&file=文件名{base64形式的数据}  
 注意:文件名中不应含有大括号且最好包含扩展名, base64数据外面的一对大括号应保留.  
