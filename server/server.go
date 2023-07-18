@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-17 22:16:02
+ * @LastEditTime: 2023-07-19 00:48:57
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -16,14 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
-
-const (
-	VER                   string = "0.1-alpha"        // Version
-	CODE_NAME             string = "Capsule"          // Code name of this version
-	SPLIT_LINE            string = "----------------" // Set the split line you want to use here.
-	DEFAULT_PORT          int    = 3690               // Default port (=(ord("A")+ord("K")+ord("B")+ord("S"))*10).
-	DEFAULT_RCVR_LOG_FILE string = "akbo-rcvr.log"    // Default [A]nti [K]idnapping [B]eacon [O]rganization [-] [R]e[C]ei[V]e[R]('s/s').[Log] file.
 )
 
 var (
@@ -60,7 +52,7 @@ func args_parser() {
 // Do this first.
 func initial() {
 	fmt.Println("[A]nti [K]idnapping [B]eacon [P]roject Server")
-	fmt.Println("Version: " + VER + ", CodeName: " + CODE_NAME)
+	fmt.Println("Version: " + VER + ", Codename: " + CODENAME)
 	fmt.Println("This is a FOSS under the AGPLv3.")
 	fmt.Println(SPLIT_LINE)
 	fmt.Println("Command = " + strings.Join(os.Args[:], " "))
@@ -76,7 +68,7 @@ func initial() {
 func default_handler(w http.ResponseWriter, r *http.Request) {
 	_ = r // Don't need var "r" in this ver.
 	fmt.Fprintln(w, "This is an [A]nti [K]idnapping [B]eacon [P]roject Server.")
-	fmt.Fprintln(w, "ServerVersion: "+VER+", CodeName: "+CODE_NAME)
+	fmt.Fprintln(w, "Version: "+VER+", Codename: "+CODENAME)
 	fmt.Fprintln(w, "!WARNING! !THIS SOFTWARE IS UNDER DEVELOPING AND SHOULD NOT BE USED IN ANY FORMAL SERVERS! !WARNING!") // Remove after the developments.
 	fmt.Fprintln(w, "!WARNING! !ANY PACKAGE SENT TO HERE MAY NOT BE HANDLE CORRECTLY! !WARNING!")                           // Remove after the developments.
 	fmt.Fprintln(w, "API Version(s) Available: "+strings.Join(API_VER_AVL[:], ", "))
