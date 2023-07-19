@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-19 00:48:57
+ * @LastEditTime: 2023-07-20 01:11:49
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -18,12 +18,7 @@ import (
 	"time"
 )
 
-var (
-	ProgName    string = ""                    //Program name in os.Args[:].
-	Port        int    = DEFAULT_PORT          //Server port.
-	RcvrLogFile string = DEFAULT_RCVR_LOG_FILE //RcvrLog file.
-	API_VER_AVL        = [...]string{"APIv1"}  // API version(s) available.
-)
+// Global consts and vars are in public.go.
 
 func err_handle(where string, err error) {
 	fmt.Println(time.Now().String() + " Error occurred at " + where + ": " + err.Error() + ".")
@@ -49,6 +44,12 @@ func args_parser() {
 	}
 }
 
+// Conf parser
+
+func conf_parser() {
+	//Devloping...
+}
+
 // Do this first.
 func initial() {
 	fmt.Println("[A]nti [K]idnapping [B]eacon [P]roject Server")
@@ -57,6 +58,7 @@ func initial() {
 	fmt.Println(SPLIT_LINE)
 	fmt.Println("Command = " + strings.Join(os.Args[:], " "))
 	args_parser()
+	conf_parser()
 	fmt.Println(SPLIT_LINE)
 	fmt.Println("ProgName = " + ProgName)
 	fmt.Println("Port = " + strconv.Itoa(Port))
