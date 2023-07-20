@@ -1,9 +1,9 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-07-20 01:10:50
+ * @LastEditTime: 2023-07-21 00:51:22
  * @LastEditors: FunctionSir
- * @Description: Public functions of AKBP Server.
+ * @Description: Public consts, vars, and functions of AKBP Server.
  * @FilePath: /AKBP/server/public.go
  */
 package main

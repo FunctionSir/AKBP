@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-19 00:01:59
+ * @LastEditTime: 2023-07-21 00:54:21
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -93,3 +93,9 @@ file: 其他要附加的文件(格式如下)
 注意:文件名中不应含有大括号且最好包含扩展名, base64数据外面的一对大括号也应经过URL编码.  
 例子: a.zip{UEsDBAoAAAAAAJEmP04AAA}.  
 URL编码后: a.zip%7BUEsDBAoAAAAAAJEmP04AAA%7D  
+
+# 架设一个服务器的需求
+
+你需要AKBP-Server与Dokuwiki.  
+建议您使用Linux系统, 因为目前本项目的所有程序均是在Linux(具体到发行版的话是Arch Linux)系统中开发与测试的.  
+当然, Windows也是可以的, 但目前未经过测试.  
