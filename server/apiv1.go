@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-16 00:26:53
- * @LastEditTime: 2023-07-19 00:50:49
+ * @LastEditTime: 2023-07-26 23:07:29
  * @LastEditors: FunctionSir
  * @Description: APIv1 related funcs.
  * @FilePath: /AKBP/server/apiv1.go
@@ -101,20 +101,22 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(time.Now().String()+" |", uuid, key, sid, eid, ts, lat, lon, alt, msg, img, file)
 	fmt.Fprintln(w, "INFO::SUCCESS")
-	fmt.Fprintln(w, "----------------")
-	fmt.Fprintln(w, "uuid = "+uuid)
-	fmt.Fprintln(w, "key = "+key)
-	fmt.Fprintln(w, "sid = "+sid)
-	fmt.Fprintln(w, "eid = "+eid)
-	fmt.Fprintln(w, "ts = "+ts)
-	fmt.Fprintln(w, "lat = "+lat)
-	fmt.Fprintln(w, "lon = "+lon)
-	fmt.Fprintln(w, "alt = "+alt)
-	fmt.Fprintln(w, "msg = "+msg)
-	fmt.Fprintln(w, "img = "+img)
-	fmt.Fprintln(w, "file = "+file)
-	fmt.Fprintln(w, "----------------")
-	fmt.Fprintln(w, "[A]nti [K]idnapping [B]eacon [P]roject Server")
-	fmt.Fprintln(w, "Version: "+VER+", Codename: "+CODENAME)
-	fmt.Fprintln(w, "Version of this API: APIv1")
+	if DEBUG {
+		fmt.Fprintln(w, "----------------")
+		fmt.Fprintln(w, "uuid = "+uuid)
+		fmt.Fprintln(w, "key = "+key)
+		fmt.Fprintln(w, "sid = "+sid)
+		fmt.Fprintln(w, "eid = "+eid)
+		fmt.Fprintln(w, "ts = "+ts)
+		fmt.Fprintln(w, "lat = "+lat)
+		fmt.Fprintln(w, "lon = "+lon)
+		fmt.Fprintln(w, "alt = "+alt)
+		fmt.Fprintln(w, "msg = "+msg)
+		fmt.Fprintln(w, "img = "+img)
+		fmt.Fprintln(w, "file = "+file)
+		fmt.Fprintln(w, "----------------")
+		fmt.Fprintln(w, "[A]nti [K]idnapping [B]eacon [P]roject Server")
+		fmt.Fprintln(w, "Version: "+VER+", Codename: "+CODENAME)
+		fmt.Fprintln(w, "Version of this API: APIv1")
+	}
 }

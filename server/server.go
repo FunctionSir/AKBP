@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-20 01:11:49
+ * @LastEditTime: 2023-07-26 23:24:48
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -38,16 +38,12 @@ func args_parser() {
 			} else {
 				err_handle("main.args_parser", err)
 			}
+		case "-b", "--beacons-db":
+			BeaconsDB = os.Args[i+1]
 		case "-r", "--rcvr-log":
 			RcvrLogFile = os.Args[i+1]
 		}
 	}
-}
-
-// Conf parser
-
-func conf_parser() {
-	//Devloping...
 }
 
 // Do this first.
@@ -55,15 +51,25 @@ func initial() {
 	fmt.Println("[A]nti [K]idnapping [B]eacon [P]roject Server")
 	fmt.Println("Version: " + VER + ", Codename: " + CODENAME)
 	fmt.Println("This is a FOSS under the AGPLv3.")
+	if DEBUG {
+		fmt.Println(SPLIT_LINE)
+		fmt.Println("!!! DEBUG flag was set to TRUE !!!")
+	}
 	fmt.Println(SPLIT_LINE)
 	fmt.Println("Command = " + strings.Join(os.Args[:], " "))
 	args_parser()
-	conf_parser()
 	fmt.Println(SPLIT_LINE)
 	fmt.Println("ProgName = " + ProgName)
 	fmt.Println("Port = " + strconv.Itoa(Port))
+	fmt.Println("BeaconsDB = " + BeaconsDB)
 	fmt.Println("RcvrLogFile = " + RcvrLogFile)
 	fmt.Println(SPLIT_LINE)
+}
+
+func beacons_db_reader() {
+	fmt.Println(time.Now().String() + " [I] Reading the BeaconsDB...")
+	//Developing...
+	fmt.Println(time.Now().String() + " [I] Done! Noticed ")
 }
 
 // Feel free to customize it!
@@ -71,8 +77,10 @@ func default_handler(w http.ResponseWriter, r *http.Request) {
 	_ = r // Don't need var "r" in this ver.
 	fmt.Fprintln(w, "This is an [A]nti [K]idnapping [B]eacon [P]roject Server.")
 	fmt.Fprintln(w, "Version: "+VER+", Codename: "+CODENAME)
-	fmt.Fprintln(w, "!WARNING! !THIS SOFTWARE IS UNDER DEVELOPING AND SHOULD NOT BE USED IN ANY FORMAL SERVERS! !WARNING!") // Remove after the developments.
-	fmt.Fprintln(w, "!WARNING! !ANY PACKAGE SENT TO HERE MAY NOT BE HANDLE CORRECTLY! !WARNING!")                           // Remove after the developments.
+	if DEBUG {
+		fmt.Fprintln(w, "!WARNING! !THIS SOFTWARE IS UNDER DEVELOPING AND SHOULD NOT BE USED IN ANY FORMAL SERVERS! !WARNING!")
+		fmt.Fprintln(w, "!WARNING! !ANY PACKAGE SENT TO HERE MAY NOT BE HANDLE CORRECTLY! !WARNING!")
+	}
 	fmt.Fprintln(w, "API Version(s) Available: "+strings.Join(API_VER_AVL[:], ", "))
 }
 
@@ -86,5 +94,6 @@ func http_server() {
 // A common but uncommon func main.
 func main() {
 	initial()
+	beacons_db_reader()
 	http_server()
 }
