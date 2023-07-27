@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-26 23:24:48
+ * @LastEditTime: 2023-07-28 00:38:25
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -19,10 +19,7 @@ import (
 )
 
 // Global consts and vars are in public.go.
-
-func err_handle(where string, err error) {
-	fmt.Println(time.Now().String() + " Error occurred at " + where + ": " + err.Error() + ".")
-}
+// Some useful funcs are also in public.go.
 
 // The os.Args parser.
 func args_parser() {
@@ -36,7 +33,7 @@ func args_parser() {
 			if err == nil {
 				Port = tmp
 			} else {
-				err_handle("main.args_parser", err)
+				Err_handle("main.args_parser", err)
 			}
 		case "-b", "--beacons-db":
 			BeaconsDB = os.Args[i+1]
@@ -68,7 +65,8 @@ func initial() {
 
 func beacons_db_reader() {
 	fmt.Println(time.Now().String() + " [I] Reading the BeaconsDB...")
-	//Developing...
+	BeaconsDBLines = Read_lines(BeaconsDB)
+	// Developing...
 	fmt.Println(time.Now().String() + " [I] Done! Noticed ")
 }
 
