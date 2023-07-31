@@ -1,7 +1,7 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-07-28 00:37:10
+ * @LastEditTime: 2023-08-01 02:40:41
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
  * @FilePath: /AKBP/server/public.go
@@ -10,6 +10,8 @@ package main
 
 import (
 	"bufio"
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
@@ -29,7 +31,7 @@ const (
 var (
 	ProgName           string = ""                    //Program name in os.Args[:].
 	Port               int    = DEFAULT_PORT          //Server port.
-	BeaconsDB          string = ""                    //Beacons DB.
+	BeaconsDB          string = DEFAULT_BEACONS_DB    //Beacons DB.
 	BeaconsDBLines            = []string{}            //Lines in beacons DB.
 	BeaconUUIDs               = []string{}            //UUIDs of beacons.
 	BeaconSaltPosOfsts        = []int{}               //Beacon Salt Position Offsets, Specially, -1=to add salt @ the end of the key.
@@ -39,13 +41,15 @@ var (
 	API_VER_AVL               = [...]string{"APIv1"}  // API version(s) available.
 )
 
-func Err_handle(where string, err error) {
+func Err_handle(where string, err error) bool {
 	if err != nil {
 		fmt.Println(time.Now().String() + " [E] Error occurred at " + where + ": " + err.Error() + ".")
+		return true
 	} else {
 		if DEBUG {
 			fmt.Println(time.Now().String() + " [I] At " + where + ": an operate was successfully done with err == nil.")
 		}
+		return false
 	}
 }
 
@@ -67,4 +71,37 @@ func Is_float_or_int(str string) bool {
 	} else {
 		return false
 	}
+}
+
+func Find_str(source []string, target string) int {
+	for i := 0; i < len(source); i++ {
+		if source[i] == target {
+			return i
+		}
+	}
+	return -1
+}
+
+func Gen_KPS(key string, offset int, salt string) string {
+	var kps string = ""
+	switch offset {
+	case 0:
+		kps = salt + key
+	case -1:
+		kps = key + salt
+	default:
+		if offset > len(key) {
+			kps = key + salt
+		} else {
+			kps = key[:offset-1] + salt + key[offset:]
+		}
+	}
+	return kps
+}
+
+func Gen_KPS_hash(key string, offset int, salt string) string {
+	kps := Gen_KPS(key, offset, salt)
+	h := sha512.New()
+	h.Write([]byte(kps))
+	return hex.EncodeToString(h.Sum(nil))
 }

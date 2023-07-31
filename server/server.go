@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-28 00:38:25
+ * @LastEditTime: 2023-07-29 16:30:48
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -66,8 +66,26 @@ func initial() {
 func beacons_db_reader() {
 	fmt.Println(time.Now().String() + " [I] Reading the BeaconsDB...")
 	BeaconsDBLines = Read_lines(BeaconsDB)
-	// Developing...
-	fmt.Println(time.Now().String() + " [I] Done! Noticed ")
+	validLines := len(BeaconsDBLines)
+	for i := 0; i < len(BeaconsDBLines); i++ {
+		tmp := strings.Split(BeaconsDBLines[i], " ")
+		if len(tmp) == 4 {
+			bspoTmp, err := strconv.Atoi(tmp[1])
+			if !Err_handle("main.beacons_db_reader", err) {
+				BeaconUUIDs = append(BeaconUUIDs, tmp[0])
+				BeaconSaltPosOfsts = append(BeaconSaltPosOfsts, bspoTmp)
+				BeaconSalts = append(BeaconSalts, tmp[2])
+				BeaconKPSHashes = append(BeaconKPSHashes, tmp[3])
+			} else {
+				fmt.Println(time.Now().String() + " [W] Ignored line #" + strconv.Itoa(i+1) + " of " + BeaconsDB + ": wrong format.")
+				validLines = validLines - 1
+			}
+		} else {
+			fmt.Println(time.Now().String() + " [W] Ignored line #" + strconv.Itoa(i+1) + " of " + BeaconsDB + ": wrong format.")
+			validLines = validLines - 1
+		}
+	}
+	fmt.Println(time.Now().String() + " [I] Done! Noticed " + strconv.Itoa(validLines) + " valid lines in " + BeaconsDB + ".")
 }
 
 // Feel free to customize it!
