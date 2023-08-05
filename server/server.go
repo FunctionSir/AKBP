@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-07-29 16:30:48
+ * @LastEditTime: 2023-08-05 22:14:38
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/server.go
@@ -100,9 +100,17 @@ func default_handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "API Version(s) Available: "+strings.Join(API_VER_AVL[:], ", "))
 }
 
+func log_viewer_handler(w http.ResponseWriter, r *http.Request) {
+	lines := Read_lines(RcvrLogFile)
+	for i := 0; i < len(lines); i++ {
+		fmt.Fprintln(w, lines[i])
+	}
+}
+
 // HTTP(S) Server.
 func http_server() {
 	http.HandleFunc("/", default_handler)
+	http.HandleFunc("/LogViewer/", log_viewer_handler)
 	http.HandleFunc("/v1/", Apiv1_handler)
 	http.ListenAndServe(":"+strconv.Itoa(Port), nil)
 }

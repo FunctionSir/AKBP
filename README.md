@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-07-21 00:54:21
+ * @LastEditTime: 2023-08-05 22:40:46
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -55,8 +55,9 @@
 
 # APIv1 (开发中, 一切随时可能变化)
 
-使用GET请求, 现有可用参数见下.
-注意: 一切参数的值均应进行URL编码, 参数内的符号也应进行URL编码.
+使用GET请求, 现有可用参数见下.  
+注意: 最好对一切参数的值都进行URL编码, 参数内的符号也应进行URL编码.  
+注意: 在存储到接收者日志中前, 参数中所有的CR或LF都会被清除. 简言之, 参数内容若是多行文本, 则会变成单行的, 且行与行之间不会额外添加任何分隔符.  
 
 ## 身份认证类
 
@@ -93,6 +94,24 @@ file: 其他要附加的文件(格式如下)
 注意:文件名中不应含有大括号且最好包含扩展名, base64数据外面的一对大括号也应经过URL编码.  
 例子: a.zip{UEsDBAoAAAAAAJEmP04AAA}.  
 URL编码后: a.zip%7BUEsDBAoAAAAAAJEmP04AAA%7D  
+
+# [A]nti [K]idnapping [B]eacon [O]rganization [-] [R]e[C]ei[V]e[R]\('s/s'\).[Log] 文件内容说明
+
+为便于人或是程序读取, 特选用ini文件的格式, 但是是log的后缀.  
+以下是说明:  
+
+## 对于APIv1
+
+```ini
+[LOG-ENTRY-UUID]
+Handler = Apiv1_handler
+ParmA = xxx
+ParmB = xxx
+ParmC = xxx
+...
+```
+
+Note: 若是DEBUG模式, 则Handler应为(DEBUG)Apiv1_handler.  
 
 # 架设一个服务器的需求
 

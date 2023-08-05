@@ -1,7 +1,7 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-08-01 02:40:41
+ * @LastEditTime: 2023-08-05 22:28:03
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
  * @FilePath: /AKBP/server/public.go
@@ -13,8 +13,10 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -47,21 +49,85 @@ func Err_handle(where string, err error) bool {
 		return true
 	} else {
 		if DEBUG {
-			fmt.Println(time.Now().String() + " [I] At " + where + ": an operate was successfully done with err == nil.")
+			fmt.Println(time.Now().String() + " [D] At " + where + ": an operate was successfully done with err == nil.")
 		}
 		return false
 	}
 }
 
+func Remove_CR_and_LF(str string) string {
+	str = strings.ReplaceAll(str, "\r", "")
+	str = strings.ReplaceAll(str, "\n", "")
+	return str
+}
+
 func Read_lines(name string) []string {
 	var r = []string{}
-	f, err := os.Open(name)
-	Err_handle("main.Read_lines", err)
+	f, e := os.Open(name)
+	Err_handle("main.Read_lines", e)
+	defer func() {
+		e := f.Close()
+		c := 0
+		for Err_handle("main.Read_lines", e) && c <= 8 {
+			e = f.Close()
+			c++
+		}
+	}()
 	fileScanner := bufio.NewScanner(f)
 	for fileScanner.Scan() {
 		r = append(r, fileScanner.Text())
 	}
 	return r
+}
+
+func Write_lines(name string, lines []string) []error {
+	var errs = []error{}
+	s, e := os.Stat(name)
+	if Err_handle("main.Write_lines", e) {
+		errs = append(errs, e)
+	}
+	f, e := os.OpenFile(name, os.O_RDWR|os.O_APPEND, s.Mode())
+	if Err_handle("main.Write_lines", e) {
+		errs = append(errs, e)
+	}
+	defer func() {
+		e := f.Close()
+		c := 0
+		for Err_handle("main.Write_lines", e) && c <= 8 {
+			e = f.Close()
+			c++
+		}
+	}()
+	tmp := []byte{0}
+	if s.Size() > 0 {
+		_, e = f.Seek(-1, io.SeekEnd)
+		if Err_handle("main.Write_lines", e) {
+			errs = append(errs, e)
+		}
+		_, _ = f.Read(tmp)
+	}
+	if s.Size() != 0 && string(tmp) != "\n" {
+		f.Seek(0, io.SeekEnd)
+		if Err_handle("main.Write_lines", e) {
+			errs = append(errs, e)
+		}
+		_, e := f.WriteString("\n")
+		if Err_handle("main.Write_lines", e) {
+			errs = append(errs, e)
+		}
+	} else {
+		f.Seek(0, io.SeekEnd)
+	}
+	for i := 0; i < len(lines); i++ {
+		if !strings.HasSuffix(lines[i], "\n") {
+			lines[i] = lines[i] + "\n"
+		}
+		_, e := f.WriteString(lines[i])
+		if Err_handle("main.Write_lines", e) {
+			errs = append(errs, e)
+		}
+	}
+	return errs
 }
 
 func Is_float_or_int(str string) bool {

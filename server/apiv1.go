@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-16 00:26:53
- * @LastEditTime: 2023-08-01 02:41:32
+ * @LastEditTime: 2023-08-05 22:31:15
  * @LastEditors: FunctionSir
  * @Description: APIv1 related funcs.
  * @FilePath: /AKBP/server/apiv1.go
@@ -16,24 +16,54 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
+const (
+	HANDLER_NAME string = "Apiv1_handler"
+)
+
+func gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file string) (string, []error) {
+	var errs = []error{}
+	var lines = []string{}
+	logEntryUUID := uuid.New().String()
+	lines = append(lines, "["+logEntryUUID+"]")
+	if !DEBUG {
+		lines = append(lines, "Handler = Apiv1_handler")
+	} else {
+		lines = append(lines, "Handler = (DEBUG)Apiv1_handler")
+	}
+	lines = append(lines, "Puuid = "+Remove_CR_and_LF(bUUID))
+	lines = append(lines, "Psid = "+Remove_CR_and_LF(sid))
+	lines = append(lines, "Peid = "+Remove_CR_and_LF(eid))
+	lines = append(lines, "Pts = "+Remove_CR_and_LF(ts))
+	lines = append(lines, "Plat = "+Remove_CR_and_LF(lat))
+	lines = append(lines, "Plon = "+Remove_CR_and_LF(lon))
+	lines = append(lines, "Palt = "+Remove_CR_and_LF(alt))
+	lines = append(lines, "Pmsg = "+Remove_CR_and_LF(msg))
+	lines = append(lines, "Pimg = "+Remove_CR_and_LF(img))
+	lines = append(lines, "Pfile = "+Remove_CR_and_LF(file))
+	errs = append(errs, Write_lines(RcvrLogFile, lines)...)
+	return logEntryUUID, errs
+}
+
 func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
-	// Get and check uuid.
-	uuid := r.URL.Query().Get("uuid")
-	if uuid == "" {
+	// Get and check bUUID.
+	bUUID := r.URL.Query().Get("uuid")
+	if bUUID == "" {
 		fmt.Fprintln(w, "ERR::UUID_NOT_FOUND")
 		if !DEBUG {
 			return
 		}
 	}
-	if len(uuid) != 36 || strings.Count(uuid, "-") != 4 { //Just a simple check
+	if len(bUUID) != 36 || strings.Count(bUUID, "-") != 4 { //Just a simple check
 		fmt.Fprintln(w, "ERR::ILLEGAL_UUID")
 		if !DEBUG {
 			return
 		}
 	}
-	beaconIndex := Find_str(BeaconUUIDs, uuid)
+	beaconIndex := Find_str(BeaconUUIDs, bUUID)
 	if beaconIndex == -1 {
 		fmt.Fprintln(w, "ERR::UUID_NOT_REGISTERED")
 		if !DEBUG {
@@ -145,7 +175,14 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if DEBUG {
-		fmt.Println(time.Now().String() + " [D] GET request received: uuid=" + uuid + ", key=" + key + ", sid=" + sid + ", eid=" + eid + ", ts=" + ts + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + ", msg=" + msg + ", img=" + img + ", file=" + file + ".")
+		fmt.Println(time.Now().String() + " [D] GET request received: uuid=" + bUUID + ", key=" + key + ", sid=" + sid + ", eid=" + eid + ", ts=" + ts + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + ", msg=" + msg + ", img=" + img + ", file=" + file + ".")
+	}
+	logEntryUUID, errs := gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file)
+	if len(errs) != 0 {
+		fmt.Fprintln(w, "ERR::FAILED_TO_GEN_LOG_ENTRY")
+		if !DEBUG {
+			return
+		}
 	}
 	if !DEBUG {
 		fmt.Fprintln(w, "INFO::SUCCESS")
@@ -154,7 +191,7 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 	}
 	if DEBUG {
 		fmt.Fprintln(w, SPLIT_LINE)
-		fmt.Fprintln(w, "uuid = "+uuid)
+		fmt.Fprintln(w, "uuid = "+bUUID)
 		fmt.Fprintln(w, "key = "+key)
 		fmt.Fprintln(w, "sid = "+sid)
 		fmt.Fprintln(w, "eid = "+eid)
@@ -170,6 +207,13 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "salt = "+BeaconSalts[beaconIndex])
 		fmt.Fprintln(w, "keyPlusSalt = "+Gen_KPS(key, BeaconSaltPosOfsts[beaconIndex], BeaconSalts[beaconIndex]))
 		fmt.Fprintln(w, "keyPlusSaltHash = "+Gen_KPS_hash(key, BeaconSaltPosOfsts[beaconIndex], BeaconSalts[beaconIndex]))
+		fmt.Fprintln(w, SPLIT_LINE)
+		fmt.Fprintln(w, "logEntryUUID = "+logEntryUUID)
+		if !DEBUG {
+			fmt.Fprintln(w, "handler = Apiv1_handler")
+		} else {
+			fmt.Fprintln(w, "handler = (DEBUG)Apiv1_handler")
+		}
 		fmt.Fprintln(w, SPLIT_LINE)
 		fmt.Fprintln(w, "[A]nti [K]idnapping [B]eacon [P]roject Server")
 		fmt.Fprintln(w, "Version: "+VER+", Codename: "+CODENAME)
