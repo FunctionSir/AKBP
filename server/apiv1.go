@@ -2,10 +2,10 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-16 00:26:53
- * @LastEditTime: 2023-08-05 22:31:15
+ * @LastEditTime: 2023-08-05 23:05:15
  * @LastEditors: FunctionSir
  * @Description: APIv1 related funcs.
- * @FilePath: /AKBP/server/apiv1.go
+ * @FilePath: /undefined/home/funcsir/Projects/AKBP/server/apiv1.go
  */
 package main
 
@@ -24,7 +24,7 @@ const (
 	HANDLER_NAME string = "Apiv1_handler"
 )
 
-func gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file string) (string, []error) {
+func gen_log_entry(rcvdTime int, bUUID, sid, eid, ts, lat, lon, alt, msg, img, file string) (string, []error) {
 	var errs = []error{}
 	var lines = []string{}
 	logEntryUUID := uuid.New().String()
@@ -34,6 +34,7 @@ func gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file string) (s
 	} else {
 		lines = append(lines, "Handler = (DEBUG)Apiv1_handler")
 	}
+	lines = append(lines, "RcvdTime = "+strconv.Itoa(rcvdTime))
 	lines = append(lines, "Puuid = "+Remove_CR_and_LF(bUUID))
 	lines = append(lines, "Psid = "+Remove_CR_and_LF(sid))
 	lines = append(lines, "Peid = "+Remove_CR_and_LF(eid))
@@ -49,6 +50,7 @@ func gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file string) (s
 }
 
 func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
+	rcvdTime := int(time.Now().Unix())
 	// Get and check bUUID.
 	bUUID := r.URL.Query().Get("uuid")
 	if bUUID == "" {
@@ -104,7 +106,7 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 	eid := r.URL.Query().Get("eid")
 	//Get and check ts.
 	ts := r.URL.Query().Get("ts")
-	if (ts != "") && (!Is_float_or_int(ts)) {
+	if (ts != "") && (!Is_int(ts)) {
 		fmt.Fprintln(w, "ERR::ILLEGAL_TS")
 		if !DEBUG {
 			return
@@ -175,9 +177,9 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if DEBUG {
-		fmt.Println(time.Now().String() + " [D] GET request received: uuid=" + bUUID + ", key=" + key + ", sid=" + sid + ", eid=" + eid + ", ts=" + ts + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + ", msg=" + msg + ", img=" + img + ", file=" + file + ".")
+		fmt.Println(time.Now().String() + " [D] GET request received at " + strconv.Itoa(rcvdTime) + ": uuid=" + bUUID + ", key=" + key + ", sid=" + sid + ", eid=" + eid + ", ts=" + ts + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + ", msg=" + msg + ", img=" + img + ", file=" + file + ".")
 	}
-	logEntryUUID, errs := gen_log_entry(bUUID, sid, eid, ts, lat, lon, alt, msg, img, file)
+	logEntryUUID, errs := gen_log_entry(rcvdTime, bUUID, sid, eid, ts, lat, lon, alt, msg, img, file)
 	if len(errs) != 0 {
 		fmt.Fprintln(w, "ERR::FAILED_TO_GEN_LOG_ENTRY")
 		if !DEBUG {

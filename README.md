@@ -1,10 +1,10 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-08-05 22:40:46
+ * @LastEditTime: 2023-08-05 23:17:19
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
- * @FilePath: /AKBP/README.md
+ * @FilePath: /undefined/home/funcsir/Projects/AKBP/README.md
 -->
 # AKBP
 
@@ -105,12 +105,22 @@ URL编码后: a.zip%7BUEsDBAoAAAAAAJEmP04AAA%7D
 ```ini
 [LOG-ENTRY-UUID]
 Handler = Apiv1_handler
-ParmA = xxx
-ParmB = xxx
-ParmC = xxx
+RcvdTime = xxx
+Puuid = xxx
+Psid = xxx
+Peid = xxx
+Pts = xxx
+Plat = xxx
+Plon = xxx
+Palt = xxx
+Pmsg = xxx
+Pimg = xxx
+Pfile =xxx
 ...
 ```
 
+Note: RcvdTime是func xxx_handler(xxx, xxx)收到请求的时间, 为Unix时间戳(单位为秒, 一般情况下误差在1s以内, 毕竟获取当前时间等操作本身就需要时间, 而且一般情况下服务器的时钟也不会完全准确, 故会有误差, 但是基本上可以看作是func xxx_handler(xxx, xxx)收到请求的时间).  
+Note: P是Parameter, 即如uuid是参数uuid对应的值. 若请求中不包括这个参数, 则记录为空的.  
 Note: 若是DEBUG模式, 则Handler应为(DEBUG)Apiv1_handler.  
 
 # 架设一个服务器的需求

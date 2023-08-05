@@ -1,10 +1,10 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-08-05 22:28:03
+ * @LastEditTime: 2023-08-05 23:00:37
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
- * @FilePath: /AKBP/server/public.go
+ * @FilePath: /undefined/home/funcsir/Projects/AKBP/server/public.go
  */
 package main
 
@@ -132,6 +132,15 @@ func Write_lines(name string, lines []string) []error {
 
 func Is_float_or_int(str string) bool {
 	_, err := strconv.ParseFloat(str, 64)
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
+}
+
+func Is_int(str string) bool {
+	_, err := strconv.Atoi(str)
 	if err == nil {
 		return true
 	} else {
