@@ -45,7 +45,7 @@ func gen_log_entry(rcvdTime int, bUUID, sid, eid, ts, lat, lon, alt, msg, img, f
 	lines = append(lines, "Pmsg = "+Remove_CR_and_LF(msg))
 	lines = append(lines, "Pimg = "+Remove_CR_and_LF(img))
 	lines = append(lines, "Pfile = "+Remove_CR_and_LF(file))
-	errs = append(errs, Write_lines(RcvrLogFile, lines)...)
+	errs = append(errs, Append_lines(RcvrLogFile, lines)...)
 	return logEntryUUID, errs
 }
 

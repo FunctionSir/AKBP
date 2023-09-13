@@ -1,10 +1,10 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-08-05 23:00:37
+ * @LastEditTime: 2023-08-24 22:59:59
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
- * @FilePath: /undefined/home/funcsir/Projects/AKBP/server/public.go
+ * @FilePath: /AKBP/server/public.go
  */
 package main
 
@@ -21,26 +21,40 @@ import (
 )
 
 const (
-	DEBUG                 bool   = true               //Debug flag, for debugging or developing purposes ONLY!
-	VER                   string = "0.1-alpha"        // Version.
-	CODENAME              string = "Capsule"          // Code name of this version.
-	SPLIT_LINE            string = "----------------" // Set the split line you want to use here.
-	DEFAULT_PORT          int    = 3690               // Default port (=(ord("A")+ord("K")+ord("B")+ord("S"))*10).
-	DEFAULT_BEACONS_DB    string = "beacons.db"       // Default beacons DB.
-	DEFAULT_RCVR_LOG_FILE string = "akbo-rcvr.log"    // Default [A]nti [K]idnapping [B]eacon [O]rganization [-] [R]e[C]ei[V]e[R]('s/s').[Log] file.
+	DEBUG                      bool   = true               // Debug flag, for debugging or developing purposes ONLY!
+	VER                        string = "0.1-alpha"        // Version.
+	CODENAME                   string = "Capsule"          // Code name of this version.
+	SPLIT_LINE                 string = "----------------" // Set the split line you want to use here.
+	DEFAULT_PORT               int    = 3690               // Default port (=(ord("A")+ord("K")+ord("B")+ord("S"))*10).
+	DEFAULT_BEACONS_DB         string = "beacons.db"       // Default beacons DB.
+	DEFAULT_RCVR_LOG_FILE      string = "akbo-rcvr.log"    // Default [A]nti [K]idnapping [B]eacon [O]rganization [-] [R]e[C]ei[V]e[R]('s/s').[Log] file.
+	DEFAULT_REG_KEY_GEN_GAP    int    = 30                 // Default gen gap of reg key gen.
+	DEFAULT_REG_KEY_STR        int    = 3                  // Default reg key strength.
+	DEFAULT_REG_KEY_FILE       string = "regkey.txt"       // Default reg key file.
+	DEFAULT_MIN_BCN_KEY_LEN    int    = 6                  // Default minimum beacon key length.
+	DEFAULT_SALT_STR           int    = 3                  // Default salt strength in reg.
+	DEFAULT_SALT_POS_OFST_OVFL int    = 5                  // Default salt pos ofst overflow.
 )
 
 var (
-	ProgName           string = ""                    //Program name in os.Args[:].
-	Port               int    = DEFAULT_PORT          //Server port.
-	BeaconsDB          string = DEFAULT_BEACONS_DB    //Beacons DB.
-	BeaconsDBLines            = []string{}            //Lines in beacons DB.
-	BeaconUUIDs               = []string{}            //UUIDs of beacons.
-	BeaconSaltPosOfsts        = []int{}               //Beacon Salt Position Offsets, Specially, -1=to add salt @ the end of the key.
-	BeaconSalts               = []string{}            //Salts of beacons.
-	BeaconKPSHashes           = []string{}            //Hashes of beacons' [K]ey +([P]lus) Salt.
-	RcvrLogFile        string = DEFAULT_RCVR_LOG_FILE //RcvrLog file.
-	API_VER_AVL               = [...]string{"APIv1"}  // API version(s) available.
+	ProgName           string = ""                         // Program name in os.Args[:].
+	Port               int    = DEFAULT_PORT               // Server port.
+	BeaconsDB          string = DEFAULT_BEACONS_DB         // Beacons DB.
+	BeaconsDBLines            = []string{}                 // Lines in beacons DB.
+	BeaconUUIDs               = []string{}                 // UUIDs of beacons.
+	BeaconSaltPosOfsts        = []int{}                    // Beacon Salt Position Offsets, Specially, -1=to add salt @ the end of the key.
+	BeaconSalts               = []string{}                 // Salts of beacons.
+	BeaconKPSHashes           = []string{}                 // Hashes of beacons' [K]ey +([P]lus) Salt.
+	RcvrLogFile        string = DEFAULT_RCVR_LOG_FILE      // RcvrLog file.
+	API_VER_AVL               = [...]string{"APIv1"}       // API version(s) available.
+	Reg_key_gen_gap    int    = DEFAULT_REG_KEY_GEN_GAP    // Gap between two reg key gen processes.
+	Reg_key_STR        int    = DEFAULT_REG_KEY_STR        // Length of the reg key, unit in UUIDs. If it's smaller than 1, it will be set to the ddefault value.
+	Reg_key_file       string = DEFAULT_REG_KEY_FILE       // Where reg key stored.
+	CurrentRegKey      string = ""                         // Current reg key.
+	PrevRegKey         string = ""                         // Prev reg key.
+	MinBcnKeyLen       int    = DEFAULT_MIN_BCN_KEY_LEN    // Minimum beacon key length.
+	SaltSTR            int    = DEFAULT_SALT_STR           // Length of the salt in reg, unit in UUIDs. If it's smaller than 1, it will be set to the ddefault value.
+	SaltPosOfstOvfl    int    = DEFAULT_SALT_POS_OFST_OVFL // range of salt pos ofst in reg = -1 ~ len(key)+SaltPosOfstOvfl.
 )
 
 func Err_handle(where string, err error) bool {
@@ -80,20 +94,20 @@ func Read_lines(name string) []string {
 	return r
 }
 
-func Write_lines(name string, lines []string) []error {
+func Append_lines(name string, lines []string) []error {
 	var errs = []error{}
 	s, e := os.Stat(name)
-	if Err_handle("main.Write_lines", e) {
+	if Err_handle("main.Append_lines", e) {
 		errs = append(errs, e)
 	}
 	f, e := os.OpenFile(name, os.O_RDWR|os.O_APPEND, s.Mode())
-	if Err_handle("main.Write_lines", e) {
+	if Err_handle("main.Append_lines", e) {
 		errs = append(errs, e)
 	}
 	defer func() {
 		e := f.Close()
 		c := 0
-		for Err_handle("main.Write_lines", e) && c <= 8 {
+		for Err_handle("main.Append_lines", e) && c <= 8 {
 			e = f.Close()
 			c++
 		}
@@ -101,18 +115,18 @@ func Write_lines(name string, lines []string) []error {
 	tmp := []byte{0}
 	if s.Size() > 0 {
 		_, e = f.Seek(-1, io.SeekEnd)
-		if Err_handle("main.Write_lines", e) {
+		if Err_handle("main.Append_lines", e) {
 			errs = append(errs, e)
 		}
 		_, _ = f.Read(tmp)
 	}
 	if s.Size() != 0 && string(tmp) != "\n" {
 		f.Seek(0, io.SeekEnd)
-		if Err_handle("main.Write_lines", e) {
+		if Err_handle("main.Append_lines", e) {
 			errs = append(errs, e)
 		}
 		_, e := f.WriteString("\n")
-		if Err_handle("main.Write_lines", e) {
+		if Err_handle("main.Append_lines", e) {
 			errs = append(errs, e)
 		}
 	} else {
@@ -123,11 +137,27 @@ func Write_lines(name string, lines []string) []error {
 			lines[i] = lines[i] + "\n"
 		}
 		_, e := f.WriteString(lines[i])
-		if Err_handle("main.Write_lines", e) {
+		if Err_handle("main.Append_lines", e) {
 			errs = append(errs, e)
 		}
 	}
 	return errs
+}
+
+func Create_file(name string, lines []string) error {
+	var s string = ""
+	f, e := os.Create(name)
+	Err_handle("main.Create_file", e)
+	for i := 0; i < len(lines); i++ {
+		if strings.HasSuffix(lines[i], "\n") {
+			s = s + lines[i]
+		} else {
+			s = s + lines[i] + "\n"
+		}
+	}
+	_, e = f.WriteString(s)
+	Err_handle("main.Create_file", e)
+	return e
 }
 
 func Is_float_or_int(str string) bool {
