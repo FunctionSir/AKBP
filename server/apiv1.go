@@ -2,10 +2,10 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-16 00:26:53
- * @LastEditTime: 2023-08-05 23:05:15
+ * @LastEditTime: 2023-09-16 23:39:50
  * @LastEditors: FunctionSir
  * @Description: APIv1 related funcs.
- * @FilePath: /undefined/home/funcsir/Projects/AKBP/server/apiv1.go
+ * @FilePath: /AKBP/server/apiv1.go
  */
 package main
 
@@ -59,7 +59,7 @@ func Apiv1_handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if len(bUUID) != 36 || strings.Count(bUUID, "-") != 4 { //Just a simple check
+	if len(bUUID) != 36 || strings.Count(bUUID, "-") != 4 || Have_upper_case(bUUID) { //Just a simple check
 		fmt.Fprintln(w, "ERR::ILLEGAL_UUID")
 		if !DEBUG {
 			return

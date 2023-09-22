@@ -1,10 +1,10 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-08-05 23:38:50
+ * @LastEditTime: 2023-09-21 20:12:41
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
- * @FilePath: /undefined/home/funcsir/Projects/AKBP/README.md
+ * @FilePath: /AKBP/README.md
 -->
 # AKBP - [A]nti [K]idnapping [B]eacon [P]roject
 
@@ -62,7 +62,7 @@
 
 ### 身份认证类
 
-uuid: 信标的UUID, 短横线应存在. 例如7ac3d9a3-9589-4b5b-b171-6cd1d94ea65c是合法的, 而去掉短横线则不行.  
+uuid: 信标的UUID, 短横线应存在. 例如7ac3d9a3-9589-4b5b-b171-6cd1d94ea65c是合法的, 而去掉短横线则不行. 字母应是小写的, 若有大写则不行.  
 key: 信标的UUID对应的Key.  
   
 注意: 若这两个参数有误或不存在这两个参数, 则请求会被直接丢弃.  

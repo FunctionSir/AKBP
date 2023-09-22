@@ -1,7 +1,7 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-08-24 22:59:59
+ * @LastEditTime: 2023-09-22 21:27:23
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
  * @FilePath: /AKBP/server/public.go
@@ -22,6 +22,7 @@ import (
 
 const (
 	DEBUG                      bool   = true               // Debug flag, for debugging or developing purposes ONLY!
+	DEBUG_VERBOSE              bool   = false              // Be verbose.
 	VER                        string = "0.1-alpha"        // Version.
 	CODENAME                   string = "Capsule"          // Code name of this version.
 	SPLIT_LINE                 string = "----------------" // Set the split line you want to use here.
@@ -37,6 +38,10 @@ const (
 )
 
 var (
+	API_VER_AVL = [...]string{"APIv1"} // API version(s) available.
+)
+
+var (
 	ProgName           string = ""                         // Program name in os.Args[:].
 	Port               int    = DEFAULT_PORT               // Server port.
 	BeaconsDB          string = DEFAULT_BEACONS_DB         // Beacons DB.
@@ -46,15 +51,14 @@ var (
 	BeaconSalts               = []string{}                 // Salts of beacons.
 	BeaconKPSHashes           = []string{}                 // Hashes of beacons' [K]ey +([P]lus) Salt.
 	RcvrLogFile        string = DEFAULT_RCVR_LOG_FILE      // RcvrLog file.
-	API_VER_AVL               = [...]string{"APIv1"}       // API version(s) available.
-	Reg_key_gen_gap    int    = DEFAULT_REG_KEY_GEN_GAP    // Gap between two reg key gen processes.
-	Reg_key_STR        int    = DEFAULT_REG_KEY_STR        // Length of the reg key, unit in UUIDs. If it's smaller than 1, it will be set to the ddefault value.
-	Reg_key_file       string = DEFAULT_REG_KEY_FILE       // Where reg key stored.
+	RegKeyGenGap       int    = DEFAULT_REG_KEY_GEN_GAP    // Gap between two reg key gen processes. Shuold >= 0.
+	RegKeySTR          int    = DEFAULT_REG_KEY_STR        // Length of the reg key, unit in UUIDs. If it's smaller than 1, it will be set to the ddefault value.
+	RegKeyFile         string = DEFAULT_REG_KEY_FILE       // Where reg key stored.
 	CurrentRegKey      string = ""                         // Current reg key.
 	PrevRegKey         string = ""                         // Prev reg key.
 	MinBcnKeyLen       int    = DEFAULT_MIN_BCN_KEY_LEN    // Minimum beacon key length.
 	SaltSTR            int    = DEFAULT_SALT_STR           // Length of the salt in reg, unit in UUIDs. If it's smaller than 1, it will be set to the ddefault value.
-	SaltPosOfstOvfl    int    = DEFAULT_SALT_POS_OFST_OVFL // range of salt pos ofst in reg = -1 ~ len(key)+SaltPosOfstOvfl.
+	SaltPosOfstOvfl    int    = DEFAULT_SALT_POS_OFST_OVFL // range of salt pos ofst in reg = -1 ~ len(key)+SaltPosOfstOvfl. Shouldn't less than 0.
 )
 
 func Err_handle(where string, err error) bool {
@@ -62,7 +66,7 @@ func Err_handle(where string, err error) bool {
 		fmt.Println(time.Now().String() + " [E] Error occurred at " + where + ": " + err.Error() + ".")
 		return true
 	} else {
-		if DEBUG {
+		if DEBUG && DEBUG_VERBOSE {
 			fmt.Println(time.Now().String() + " [D] At " + where + ": an operate was successfully done with err == nil.")
 		}
 		return false
@@ -209,4 +213,24 @@ func Gen_KPS_hash(key string, offset int, salt string) string {
 	h := sha512.New()
 	h.Write([]byte(kps))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+func File_is_exist(name string) bool {
+	_, err := os.Stat(name)
+	if err == nil {
+		return true
+	} else if os.IsExist(err) {
+		return true
+	} else {
+		return false
+	}
+}
+
+func Have_upper_case(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 'A' && s[i] <= 'Z' {
+			return true
+		}
+	}
+	return false
 }

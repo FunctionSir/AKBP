@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-09-03 14:38:53
+ * @LastEditTime: 2023-09-22 22:45:13
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/main.go
@@ -44,6 +44,56 @@ func args_parser() {
 			BeaconsDB = os.Args[i+1]
 		case "-r", "--rcvr-log":
 			RcvrLogFile = os.Args[i+1]
+		case "-rkf", "--reg-key-file":
+			RegKeyFile = os.Args[i+1]
+		case "-mbkl", "--min-bcn-key-len":
+			var tmp int
+			tmp, err := strconv.Atoi(os.Args[i+1])
+			if err == nil {
+				MinBcnKeyLen = tmp
+			} else {
+				Err_handle("main.args_parser", err)
+			}
+		case "-ss", "--salt-str":
+			var tmp int
+			tmp, err := strconv.Atoi(os.Args[i+1])
+			if err == nil {
+				if tmp > 1 {
+					SaltSTR = tmp
+				}
+			} else {
+				Err_handle("main.args_parser", err)
+			}
+		case "-spoo", "--salt-pos-ofst-ovfl":
+			var tmp int
+			tmp, err := strconv.Atoi(os.Args[i+1])
+			if err == nil {
+				if tmp >= 0 {
+					SaltPosOfstOvfl = tmp
+				}
+			} else {
+				Err_handle("main.args_parser", err)
+			}
+		case "-rks", "--reg-key-str":
+			var tmp int
+			tmp, err := strconv.Atoi(os.Args[i+1])
+			if err == nil {
+				if tmp > 1 {
+					RegKeySTR = tmp
+				}
+			} else {
+				Err_handle("main.args_parser", err)
+			}
+		case "-rkgg", "--reg-key-gen-gap":
+			var tmp int
+			tmp, err := strconv.Atoi(os.Args[i+1])
+			if err == nil {
+				if tmp >= 0 {
+					RegKeyGenGap = tmp
+				}
+			} else {
+				Err_handle("main.args_parser", err)
+			}
 		}
 	}
 }
@@ -66,9 +116,11 @@ func initial() {
 	fmt.Println("BeaconsDB = " + BeaconsDB)
 	fmt.Println("RcvrLogFile = " + RcvrLogFile)
 	fmt.Println(SPLIT_LINE)
-	fmt.Println(time.Now().String() + " [I] Reading reg key file...")
-	PrevRegKey = Read_lines(Reg_key_file)[0]
-	CurrentRegKey = PrevRegKey
+	if File_is_exist(RegKeyFile) {
+		fmt.Println(time.Now().String() + " [I] Reading reg key file...")
+		PrevRegKey = Read_lines(RegKeyFile)[0]
+		CurrentRegKey = PrevRegKey
+	}
 }
 
 func beacons_db_reader() {
@@ -109,14 +161,16 @@ func default_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func gen_reg_key() {
-	var newRegKey string = ""
-	for i := 0; i < Reg_key_STR; i++ {
-		newRegKey = newRegKey + uuid.New().String()
+	for {
+		var newRegKey string = ""
+		for i := 0; i < RegKeySTR; i++ {
+			newRegKey = newRegKey + uuid.New().String()
+		}
+		Create_file(RegKeyFile, []string{newRegKey})
+		PrevRegKey = CurrentRegKey
+		CurrentRegKey = Read_lines(RegKeyFile)[0]
+		time.Sleep(time.Duration(RegKeyGenGap) * time.Second)
 	}
-	Create_file(Reg_key_file, []string{newRegKey})
-	PrevRegKey = CurrentRegKey
-	CurrentRegKey = Read_lines(Reg_key_file)[0]
-	time.Sleep(time.Duration(Reg_key_gen_gap) * time.Second)
 }
 
 func reg_handler(w http.ResponseWriter, r *http.Request) {
@@ -177,6 +231,7 @@ func reg_handler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintln(w, "WARN::DEBUG_MODE_ON")
 	}
+	fmt.Println(time.Now().String() + " [I] Reged a new beacon, UUID=" + bcnUUID + ".")
 }
 
 func log_viewer_handler(w http.ResponseWriter, r *http.Request) {
