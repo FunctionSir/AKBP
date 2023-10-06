@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-08-11 18:47:23
- * @LastEditTime: 2023-09-22 22:47:29
+ * @LastEditTime: 2023-10-07 07:22:28
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of midware-dokuwiki.
  * @FilePath: /AKBP/midware-dokuwiki/public.go
@@ -20,22 +20,23 @@ import (
 )
 
 const (
-	DEBUG                         bool   = true                         // Debug flag, for debugging or developing purposes ONLY!
-	DEBUG_VERBOSE                 bool   = false                        // Be verbose.
-	VER                           string = "0.1-alpha"                  // Version.
-	CODENAME                      string = "Capsule"                    // Code name of this version.
-	SPLIT_LINE                    string = "----------------"           // Set the split line you want to use here.
-	DEFAULT_BASE_DIR              string = ""                           // Default value of var BaseDir.
-	DEFAULT_USERS_DIR             string = "dw-users"                   // Default value of var "UsersDir".
-	DEFAULT_SEC_DIR               string = "private"                    // Default value of var "SecDir".
-	DEFAULT_THIRD_DIR             string = "AKBP"                       // Default value of var "ThirdDir"
-	DEFAULT_BCN_LIST_FILE         string = "MyBeacons"                  // Default value of var "BcnListFile"
-	DEFAULT_REG_KEY_FILE          string = "regkey.txt"                 // Default reg key file.
-	DEFAULT_FILE_NAME_OF_REG_REQS string = "akbp-new-bcn-reg.txt"       // Default value of RegReqFile.
-	DEFAULT_USERFILE              string = "users.auth.php"             // Default value of Userfile.
-	DEFAULT_RELS_DB               string = "relations.db"               // Default value of RelsDB.
-	DEFAULT_REG_API               string = "http://127.0.0.1:3690/reg/" // Default reg API.
-	DEFAULT_ACT_GAP               int    = 1                            // Default action gap.
+	DEBUG                         bool   = false                          // Debug flag, for debugging or developing purposes ONLY!
+	DEBUG_VERBOSE                 bool   = false                          // Be verbose.
+	VER                           string = "0.1-alpha"                    // Version.
+	CODENAME                      string = "Capsule"                      // Code name of this version.
+	SPLIT_LINE                    string = "----------------"             // Set the split line you want to use here.
+	DEFAULT_BASE_DIR              string = "/home/funcsir/Projects/TEST/" // Default value of var BaseDir.
+	DEFAULT_USERS_DIR             string = "dw-users"                     // Default value of var "UsersDir".
+	DEFAULT_SEC_DIR               string = "private"                      // Default value of var "SecDir".
+	DEFAULT_THIRD_DIR             string = "AKBP"                         // Default value of var "ThirdDir"
+	DEFAULT_BCN_LIST_FILE         string = "MyBeacons"                    // Default value of var "BcnListFile"
+	DEFAULT_REG_KEY_FILE          string = "regkey.txt"                   // Default reg key file.
+	DEFAULT_FILE_NAME_OF_REG_REQS string = "akbp-new-bcn-reg.txt"         // Default value of RegReqFile.
+	DEFAULT_USERFILE              string = "users.auth.php"               // Default value of Userfile.
+	DEFAULT_RELS_DB               string = "relations.db"                 // Default value of RelsDB.
+	DEFAULT_RCVR_LOG_FILE         string = "akbo-rcvr.log"                // Default value of RcvrLogFile.
+	DEFAULT_REG_API               string = "http://127.0.0.1:3690/reg/"   // Default reg API.
+	DEFAULT_ACT_GAP               int    = 1                              // Default action gap (seconds).
 )
 
 var (
@@ -49,6 +50,7 @@ var (
 	FileNameOfRegReqs string = DEFAULT_FILE_NAME_OF_REG_REQS // File name of reg reqs.
 	Userfile          string = DEFAULT_USERFILE              // Typically, it is users.auth.php.
 	RelsDB            string = DEFAULT_RELS_DB               // Relations DB.
+	RcvrLogFile       string = DEFAULT_RCVR_LOG_FILE         // [A]nti [K]idnapping [B]eacon [O]rganization [-] [R]e[C]ei[V]e[R]('s/s').[Log] file.
 	RegAPI            string = DEFAULT_REG_API               // Reg API.
 	ActGap            int    = DEFAULT_ACT_GAP               // Gap between actions. Should >= 0.
 )

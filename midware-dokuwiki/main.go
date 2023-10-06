@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-08-08 18:02:01
- * @LastEditTime: 2023-09-22 22:29:25
+ * @LastEditTime: 2023-10-07 06:56:01
  * @LastEditors: FunctionSir
  * @Description: Midware to connect AKBP-Server and Dokuwiki.
  * @FilePath: /AKBP/midware-dokuwiki/main.go
@@ -20,6 +20,9 @@ import (
 
 	"github.com/go-ini/ini"
 )
+
+// Global consts and vars are in public.go.
+// Some useful funcs are also in public.go.
 
 func LF_process(input string) string {
 	return strings.ReplaceAll(input, "\n", "\\n")
@@ -104,16 +107,21 @@ func reg_new_bcns() {
 				}
 				if wFlag {
 					var toWrite = []string{}
+					var bcnUUID = ""
 					if !DEBUG {
-						toWrite = []string{"[" + splitedRespBody[Find_str(splitedRespBody, "INFO::SUCCESS")-1] + "]", "ExtInfo = " + regReq.Section("").Key("ExtInfo").String()}
+						bcnUUID = splitedRespBody[Find_str(splitedRespBody, "INFO::SUCCESS")-1]
+						toWrite = []string{"[" + bcnUUID + "]", "ExtInfo = " + regReq.Section("").Key("ExtInfo").String()}
+
 					} else {
-						toWrite = []string{"[" + splitedRespBody[Find_str(splitedRespBody, "WARN::DEBUG_MODE_ON")-1] + "]", "ExtInfo = " + regReq.Section("").Key("ExtInfo").String()}
+						bcnUUID = splitedRespBody[Find_str(splitedRespBody, "WARN::DEBUG_MODE_ON")-1]
+						toWrite = []string{"[" + bcnUUID + "]", "ExtInfo = " + regReq.Section("").Key("ExtInfo").String()}
 					}
 					if File_is_exist(bcnListFile) {
 						Append_lines(bcnListFile, toWrite)
 					} else {
 						Create_file(bcnListFile, toWrite)
 					}
+					gen_rels_db_entry(bcnUUID, relatedUser[i])
 					err := os.Remove(regReqFiles[i]) // Remove reg req if succeeded.
 					Err_handle("main.reg_new_bcns", err)
 				}
@@ -135,10 +143,28 @@ func reg_new_bcns() {
 	}
 }
 
+func gen_rels_db_entry(uuid, username string) {
+	f := Unify_path(BaseDir, true) + Unify_path(RelsDB, false)
+	if File_is_exist(f) {
+		Append_lines(f, []string{uuid + " " + username})
+	} else {
+		Create_file(f, []string{uuid + " " + username})
+	}
+}
+
+// func rcvr_log_parser() {
+// 	file, err := ini.Load(Unify_path(BaseDir, true) + Unify_path(RcvrLogFile, false))
+// 	if !Err_handle("main.rcvr_log_parser", err) {
+// 		sectionStrs := file.SectionStrings()
+// 		for i := 1; i < len(sectionStrs); i++ {
+// 			_ = i
+// 		}
+// 	}
+// }
+
 func args_parser() {
-	var i int
 	ProgName = os.Args[0]
-	for i = 1; i < len(os.Args); i++ {
+	for i := 1; i < len(os.Args); i++ {
 		switch os.Args[i] {
 		case "-b", "--base-dir":
 			BaseDir = os.Args[i+1]
@@ -185,6 +211,7 @@ func main() {
 	initial()
 	flag := false
 	for !flag {
+		// rcvr_log_parser()
 		reg_new_bcns()
 		time.Sleep(time.Duration(ActGap) * time.Second)
 	}

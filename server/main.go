@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2023-07-14 23:11:35
- * @LastEditTime: 2023-09-22 22:45:13
+ * @LastEditTime: 2023-09-24 15:23:10
  * @LastEditors: FunctionSir
  * @Description: Server of AKBP for beacons to link.
  * @FilePath: /AKBP/server/main.go
@@ -28,9 +28,8 @@ import (
 
 // The os.Args parser.
 func args_parser() {
-	var i int
 	ProgName = os.Args[0]
-	for i = 1; i < len(os.Args); i++ {
+	for i := 1; i < len(os.Args); i++ {
 		switch os.Args[i] {
 		case "-p", "--port":
 			var tmp int

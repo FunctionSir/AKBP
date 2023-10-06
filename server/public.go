@@ -1,7 +1,7 @@
 /*
  * @Author: FunctionSir
  * @Date: 2023-07-17 22:47:42
- * @LastEditTime: 2023-09-22 21:27:23
+ * @LastEditTime: 2023-10-07 07:22:46
  * @LastEditors: FunctionSir
  * @Description: Public consts, vars, and functions of AKBP Server.
  * @FilePath: /AKBP/server/public.go
@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	DEBUG                      bool   = true               // Debug flag, for debugging or developing purposes ONLY!
+	DEBUG                      bool   = false              // Debug flag, for debugging or developing purposes ONLY!
 	DEBUG_VERBOSE              bool   = false              // Be verbose.
 	VER                        string = "0.1-alpha"        // Version.
 	CODENAME                   string = "Capsule"          // Code name of this version.
