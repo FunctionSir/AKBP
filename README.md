@@ -1,15 +1,20 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2023-09-21 20:12:41
+ * @LastEditTime: 2024-09-10 22:11:00
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
 -->
+
 # AKBP - [A]nti [K]idnapping [B]eacon [P]roject
 
 受国际搜救卫星组织的信标启发的, 可用智能手机或其他可直接或间接连接到互联网的硬件作为信标的, 可自行架设服务器的, 反对绑架/虐待型"教育学校/矫正学校"的项目.  
 愿每个人都可以不受绑架及虐待!  
+
+## 一切将被重新设计
+
+鉴于之前的代码质量太过低下, 协议设计更是非常糟糕, 故近期将进行大量的重新设计工作.
 
 ## 务必注意
 
