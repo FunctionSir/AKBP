@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2024-09-14 23:28:11
+ * @LastEditTime: 2024-09-14 23:34:30
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -45,7 +45,7 @@ AKBP项目目前正在重写. 在正式宣布可用前, 仅可用于测试.
 
 ## 我可以构建属于我自己的硬件信标么?
 
-你当然可以. 这套系统是基于HTTP(S)的, 目前可以用GET请求来发送相关信息. 也就是说, 不管你是树莓派, 还是ESP32, 还是其他东西, 只要能进行特定GET请求, 就可以将信息送过来, 也就是说, 可以作为信标.  
+你当然可以. 这套系统是基于HTTP(S)的, 目前可以用HTTP请求来发送相关信息. 也就是说, 不管你是树莓派, 还是ESP32, 还是其他东西, 只要能进行特定请求, 就可以将信息送过来, 也就是说, 可以作为信标.  
 
 ## 架设一个服务器的需求
 
