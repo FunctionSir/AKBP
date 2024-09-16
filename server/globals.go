@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:19:36
- * @LastEditTime: 2024-09-14 23:13:33
+ * @LastEditTime: 2024-09-16 22:42:09
  * @LastEditors: FunctionSir
  * @Description: Global consts and vars.
  * @FilePath: /AKBP/server/globals.go
@@ -22,31 +22,54 @@ const (
 const (
 	DEFAULT_ADDR string = "127.0.0.1:4060" // Default listening address.
 	DEFAULT_DB   string = "akbp.db"        // Default DB.
+	DEFAULT_SID  string = ""               // Default server ID.
 )
 
-// COMMON //
+// COMMON CONSTS //
+
+const (
+	ADD_TTL int = 64
+)
+
+// COMMON VARS //
 
 var (
-	DebugMode  bool   = false
-	ConfigFile string = "" // Path of config file.
+	DebugMode  bool   = false       // Switch to true to enable debug for Gin.
+	ConfigFile string = ""          // Path of config file.
+	ServerId   string = DEFAULT_SID // Server ID.
 )
 
 // CONFIG //
 
 var (
-	ConfLoaded bool   = false        // To prevent data races, do not change it manually.
-	Addr       string = DEFAULT_ADDR // Listening address.
-	Db         string = DEFAULT_DB   // DB to use.
+	ConfLoaded   bool              = false        // To prevent data races, do not change it manually.
+	Addr         string            = DEFAULT_ADDR // Listening address.
+	Db           string            = DEFAULT_DB   // DB to use.
+	KnownServers map[string]string = nil
+	KeysForAuth  map[string]string = nil
+)
+
+// FOR SQL //
+
+const (
+	TABLE_BEACONS string = "BEACONS"
+	TABLE_SERVERS string = "SERVERS"
+	STR_BEACON    string = "BEACON"
+	STR_SERVER    string = "SERVER"
 )
 
 // HEADERS //
 
 const (
-	KEY_AKBP_MSG_TYPE  string = "X-Akbp-Msg-Type"
-	KEY_AKBP_BEACON_ID string = "X-Akbp-Beacon-Id"
-	KEY_AKBP_AUTH      string = "X-Akbp-Auth"
-	KEY_AKBP_TIMESTAMP string = "X-Akbp-Timestamp"
-	KEY_AKBP_EVENT_ID  string = "X-Akbp-Event-Id"
+	KEY_AKBP_MSG_TYPE          string = "X-Akbp-Msg-Type"
+	KEY_AKBP_BEACON_ID         string = "X-Akbp-Beacon-Id"
+	KEY_AKBP_AUTH              string = "X-Akbp-Auth"
+	KEY_AKBP_TIMESTAMP         string = "X-Akbp-Timestamp"
+	KEY_AKBP_EVENT_ID          string = "X-Akbp-Event-Id"
+	KEY_AKBP_DO_NOT_FORWARD_TO string = "X-Akbp-Do-Not-Forward-To"
+	KEY_AKBP_SERVER_ID         string = "X-Akbp-Server-Id"
+	KEY_AKBP_TTL               string = "X-Akbp-Ttl"
+	KEY_CONTENT_TYPE           string = "Content-Type"
 )
 
 // ERRORS //

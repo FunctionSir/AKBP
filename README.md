@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2024-09-14 23:34:30
+ * @LastEditTime: 2024-09-16 23:38:21
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -20,6 +20,11 @@ AKBP项目目前正在重写. 在正式宣布可用前, 仅可用于测试.
 ## 务必注意
 
 目前正在开发调试及测试阶段, 系统无法正常工作, 所有发来的数据包将可能不被认真对待.  
+
+## 征求意见
+
+1. 时间戳的单位问题.
+2. 各(信标/服务器/HUB)ID的最大长度.
 
 ## 为什么有了这个项目?
 
