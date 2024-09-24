@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:19:36
- * @LastEditTime: 2024-09-16 22:42:09
+ * @LastEditTime: 2024-09-22 01:41:52
  * @LastEditors: FunctionSir
  * @Description: Global consts and vars.
  * @FilePath: /AKBP/server/globals.go
@@ -45,8 +45,8 @@ var (
 	ConfLoaded   bool              = false        // To prevent data races, do not change it manually.
 	Addr         string            = DEFAULT_ADDR // Listening address.
 	Db           string            = DEFAULT_DB   // DB to use.
-	KnownServers map[string]string = nil
-	KeysForAuth  map[string]string = nil
+	KnownServers map[string]string = nil          // Known servers.
+	KeysForAuth  map[string]string = nil          // Auth info for known servers.
 )
 
 // FOR SQL //
@@ -56,6 +56,10 @@ const (
 	TABLE_SERVERS string = "SERVERS"
 	STR_BEACON    string = "BEACON"
 	STR_SERVER    string = "SERVER"
+	DB_INIT       string = "CREATE TABLE BEACONS (ID TEXT PRIMARY KEY NOT NULL UNIQUE, SALT TEXT NOT NULL UNIQUE, HASH TEXT NOT NULL UNIQUE);" +
+		"CREATE TABLE RECORDS (BID TEXT NOT NULL, EID TEXT NOT NULL, TS INTEGER NOT NULL, MSG TEXT, ORIGIN TEXT);" +
+		"CREATE TABLE SERVERS (ID TEXT PRIMARY KEY NOT NULL UNIQUE, SALT TEXT NOT NULL UNIQUE, HASH TEXT NOT NULL UNIQUE);" +
+		"CREATE TABLE RECEIVED(HASH TEXT NOT NULL UNIQUE);" // This will be exec DIRECTLY if needed!
 )
 
 // HEADERS //
@@ -70,6 +74,12 @@ const (
 	KEY_AKBP_SERVER_ID         string = "X-Akbp-Server-Id"
 	KEY_AKBP_TTL               string = "X-Akbp-Ttl"
 	KEY_CONTENT_TYPE           string = "Content-Type"
+)
+
+// OK //
+
+const (
+	HTTP_200_OK string = "200 OK"
 )
 
 // ERRORS //

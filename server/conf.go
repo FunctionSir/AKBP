@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 00:23:17
- * @LastEditTime: 2024-09-16 21:18:51
+ * @LastEditTime: 2024-09-22 01:42:23
  * @LastEditors: FunctionSir
  * @Description: Config related.
  * @FilePath: /AKBP/server/conf.go
@@ -34,6 +34,9 @@ func LoadConf() {
 	}
 	if section.HasKey("ServerID") {
 		ServerId = section.Key("ServerID").String()
+	}
+	if section.HasKey("MainDB") {
+		Db = section.Key("MainDB").String()
 	}
 	if conf.HasSection("known-servers") {
 		KnownServers = make(map[string]string)

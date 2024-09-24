@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:07:34
- * @LastEditTime: 2024-09-16 23:25:29
+ * @LastEditTime: 2024-09-22 11:55:30
  * @LastEditors: FunctionSir
  * @Description: AKBP Server, main file.
  * @FilePath: /AKBP/server/main.go
@@ -11,6 +11,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +20,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
@@ -33,7 +35,6 @@ func initialize() {
 			color.NoColor = true
 			gin.DisableConsoleColor()
 		case "--debug":
-			gin.SetMode(gin.DebugMode)
 			DebugMode = true
 		}
 	}
@@ -42,6 +43,9 @@ func initialize() {
 	}
 	if !DebugMode {
 		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+		LogWarnln("You are in debug mode currently.")
 	}
 	Hello() // Say hello.
 	if len(os.Args) <= 1 {
@@ -66,6 +70,16 @@ func doPost(url string, headers *http.Header, kv *map[string]string) {
 	}
 	// Just let it alone.
 	go http.DefaultClient.Do(req)
+}
+
+func reportOk(c *gin.Context) {
+	c.Header(KEY_AKBP_MSG_TYPE, "server-report")
+	c.String(http.StatusOK, HTTP_200_OK+" "+fmt.Sprint(time.Now().UnixMilli()))
+}
+
+func pong(c *gin.Context) {
+	c.Header(KEY_AKBP_MSG_TYPE, "pong")
+	c.String(http.StatusOK, "pong")
 }
 
 func srvToSrvForward(c *gin.Context) {
@@ -120,29 +134,32 @@ func srvToSrvForward(c *gin.Context) {
 }
 
 func beaconReportHandler(c *gin.Context) {
+	// Get beacon ID.
+	bid := c.GetHeader(KEY_AKBP_BEACON_ID)
+	if len(bid) == 0 || !ChkStrNoExit(&bid) {
+		c.Header(KEY_AKBP_MSG_TYPE, "error")
+		c.String(http.StatusBadRequest, ERR_WRONG_BEACON_ID_OR_AUTH_INFO)
+		return
+	}
+	// Get key.
+	key := c.GetHeader(KEY_AKBP_AUTH)
+	if len(key) == 0 {
+		c.Header(KEY_AKBP_MSG_TYPE, "error")
+		c.String(http.StatusUnauthorized, ERR_NO_VALID_AUTH_HEADER)
+		return
+	}
+	// Auth here.
+	if !AuthOK(TABLE_BEACONS, bid, key) {
+		c.Header(KEY_AKBP_MSG_TYPE, "error")
+		c.String(http.StatusForbidden, ERR_WRONG_BEACON_ID_OR_AUTH_INFO)
+		return
+	}
+	// To process the message.
 	msgType := c.GetHeader(KEY_AKBP_MSG_TYPE)
 	switch msgType {
-	case "ping":
-		c.Header(KEY_AKBP_MSG_TYPE, "pong")
-		c.String(http.StatusOK, "pong")
+	case "ping": // This ping can use as a kind of auth test.
+		pong(c)
 	case "beacon-report":
-		bid := c.GetHeader(KEY_AKBP_BEACON_ID)
-		if len(bid) == 0 || !ChkStrNoExit(&bid) {
-			c.Header(KEY_AKBP_MSG_TYPE, "error")
-			c.String(http.StatusBadRequest, ERR_WRONG_BEACON_ID_OR_AUTH_INFO)
-			return
-		}
-		key := c.GetHeader(KEY_AKBP_AUTH)
-		if len(key) == 0 {
-			c.Header(KEY_AKBP_MSG_TYPE, "error")
-			c.String(http.StatusUnauthorized, ERR_NO_VALID_AUTH_HEADER)
-			return
-		}
-		if !AuthOK(TABLE_BEACONS, bid, key) {
-			c.Header(KEY_AKBP_MSG_TYPE, "error")
-			c.String(http.StatusForbidden, ERR_WRONG_BEACON_ID_OR_AUTH_INFO)
-			return
-		}
 		eid := c.GetHeader(KEY_AKBP_EVENT_ID)
 		if len(eid) == 0 {
 			c.Header(KEY_AKBP_MSG_TYPE, "error")
@@ -155,8 +172,13 @@ func beaconReportHandler(c *gin.Context) {
 			c.String(http.StatusBadRequest, ERR_BAD_TIMESTAMP)
 			return
 		}
-		AddRecord(bid, eid, ts, c.PostForm("msg"), STR_BEACON+"-"+bid) // Add new record.
-		srvToSrvForward(c)                                             // Forward.
+		// Add new record.
+		if AddRecord(bid, eid, ts, c.PostForm("msg"), STR_BEACON+"-"+bid) {
+			// Forward.
+			srvToSrvForward(c)
+		}
+		// Report.
+		reportOk(c)
 	default:
 		c.Header(KEY_AKBP_MSG_TYPE, "error")
 		c.String(http.StatusBadRequest, ERR_UNKNOWN_MSG_TYPE)
@@ -169,22 +191,36 @@ func fromServerHandler(c *gin.Context) {
 	if !AuthOK(TABLE_SERVERS, sid, key) {
 		return
 	}
-	bid := c.GetHeader(KEY_AKBP_BEACON_ID)
-	eid := c.GetHeader(KEY_AKBP_EVENT_ID)
-	tsStr := c.GetHeader(KEY_AKBP_TIMESTAMP)
-	tsInt, err := strconv.Atoi(tsStr)
-	msg := c.PostForm("msg")
-	if bid == "" || eid == "" || tsStr == "" || err != nil || !ChkStrNoExit(&sid) || !ChkStrNoExit(&bid) {
-		return
+	msgType := c.GetHeader(KEY_AKBP_MSG_TYPE)
+	switch msgType {
+	case "ping":
+		pong(c)
+	case "forwarded":
+		bid := c.GetHeader(KEY_AKBP_BEACON_ID)
+		eid := c.GetHeader(KEY_AKBP_EVENT_ID)
+		tsStr := c.GetHeader(KEY_AKBP_TIMESTAMP)
+		tsInt, err := strconv.Atoi(tsStr)
+		msg := c.PostForm("msg")
+		if bid == "" || eid == "" || tsStr == "" || err != nil || !ChkStrNoExit(&sid) || !ChkStrNoExit(&bid) {
+			return
+		}
+		if AddRecord(bid, eid, tsInt, msg, STR_SERVER+"-"+sid) {
+			srvToSrvForward(c)
+		}
+		reportOk(c)
+	default:
+		c.Header(KEY_AKBP_MSG_TYPE, "error")
+		c.String(http.StatusBadRequest, ERR_UNKNOWN_MSG_TYPE)
 	}
-	AddRecord(bid, eid, tsInt, msg, STR_SERVER+"-"+sid)
-	srvToSrvForward(c)
 }
 
 func main() {
 	initialize()
 	LoadConf()
-
+	if !FileExists(Db) {
+		LogWarnln("Specified DB not found, will create and init a new one.")
+		DbInit()
+	}
 	// If no valid server ID.
 	if ServerId == "" {
 		LogWarnln("No valid server ID, server to server forward will be disabled.")
@@ -205,8 +241,7 @@ func main() {
 
 	// Ping //
 	ginEng.GET("/ping", func(c *gin.Context) {
-		c.Header(KEY_AKBP_MSG_TYPE, "pong")
-		c.String(http.StatusOK, "pong")
+		pong(c)
 	})
 
 	// Fortune //
@@ -229,5 +264,6 @@ func main() {
 	// From-Server //
 	ginEng.POST("/from-server", fromServerHandler)
 
+	LogInfoln("Everything is OK, ready to start the HTTP(S) service.")
 	ginEng.Run(Addr)
 }

@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-16 21:23:59
- * @LastEditTime: 2024-09-16 22:13:35
+ * @LastEditTime: 2024-09-22 00:48:36
  * @LastEditors: FunctionSir
  * @Description: -
  * @FilePath: /AKBP/server/auth.go
