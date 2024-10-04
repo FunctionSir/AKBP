@@ -13,8 +13,6 @@ package main
 import (
 	"crypto/sha512"
 	"fmt"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func CalcMsgHash(bid string, eid string, ts int, msg string) string {

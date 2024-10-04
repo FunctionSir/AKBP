@@ -2,10 +2,10 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 21:33:33
- * @LastEditTime: 2024-09-30 19:46:36
+ * @LastEditTime: 2024-10-03 22:28:45
  * @LastEditors: FunctionSir
  * @Description: DB related.
- * @FilePath: /AKBP/server/db.go
+ * @FilePath: /AKBP/midware-dokuwiki/db.go
  */
 
 package main
@@ -59,9 +59,14 @@ func DbPrepare(db *sql.DB, query string) *sql.Stmt {
 	return stmt
 }
 
-// Init a new DB.
-func DbInit() {
+func QueryRecs() *sql.Rows {
 	db := DbOpen()
 	defer db.Close()
-	db.Exec(DB_INIT)
+	stmt := DbPrepare(db, "SELECT ROWID,BID,EID,TS,MSG,ORIGIN FROM RECORDS ORDER BY TS;")
+	rows, err := stmt.Query()
+	if err != nil {
+		LogWarnln("An error occurred when performing a query.")
+		return nil
+	}
+	return rows
 }

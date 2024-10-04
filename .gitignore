@@ -24,3 +24,4 @@ go.work
 server/akbp.db
 server/testA.conf
 server/testB.conf
+midware-dokuwiki/example.kml
