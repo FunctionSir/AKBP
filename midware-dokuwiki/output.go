@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:47:30
- * @LastEditTime: 2024-09-24 22:59:07
+ * @LastEditTime: 2024-10-07 17:58:59
  * @LastEditors: FunctionSir
  * @Description: Print logs, or other output things.
  * @FilePath: /AKBP/midware-dokuwiki/output.go

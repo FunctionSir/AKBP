@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-24 22:49:18
- * @LastEditTime: 2024-10-04 22:33:09
+ * @LastEditTime: 2024-10-07 17:00:34
  * @LastEditors: FunctionSir
  * @Description: -
  * @FilePath: /AKBP/midware-dokuwiki/globals.go
@@ -56,4 +56,6 @@ var (
 	AllEntriesNs    string = DEFAULT_ALL_ENTRIE_NS     // Ns for all entries.
 	EventsNs        string = DEFAULT_EVENTS_NS         // Ns for "by events".
 	KmlsNs          string = DEFAULT_KMLS_NS           // Ns for kmls.
+	Domain          string = ""                        // Domain.
+	UsersDir        string = ""                        // Users dirs.
 )

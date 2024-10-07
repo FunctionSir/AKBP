@@ -1,0 +1,18 @@
+====== REGISTER YOUR BEACON ======
+<form>
+action template akbp_template :user:@USER@:akbp_beacon_registration
+fieldset "Explanation"
+static "Beacon ID can only contains A~Z, a~z, 0~9, and _."
+static "Beacon ID should NOT longer than 32 chars."
+static "Note can let us know some info of you."
+static "If you successfully resisted your beacon, the registration file will be remove."
+static "That might need you to wait a while, determined by the update frequency of this server."
+static "If your beacon ID was used by someone else, the registration will fail too, please change it."
+static "The finally bid will added a tail of @xxx, to mark your origin."
+fieldset "Beacon Info"
+textbox "Beacon ID"
+textbox "Key"
+textbox "Note"
+fieldset "Submit"
+submit
+</form>

@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-22 14:46:17
- * @LastEditTime: 2024-10-04 23:50:19
+ * @LastEditTime: 2024-10-07 16:59:58
  * @LastEditors: FunctionSir
  * @Description: The bridge to dokuwiki.
  * @FilePath: /AKBP/midware-dokuwiki/main.go
@@ -94,6 +94,8 @@ func main() {
 	// The main loop.
 	for {
 		startTime := time.Now().UnixMilli()
+		// Handle reg requests.
+		totRegRequests, reged := ProcessRegRequests(UsersDir)
 		processed = 0
 		var rowId int
 		var bid string
@@ -200,7 +202,7 @@ func main() {
 		GenByEventSummary(path.Join(eventsDir, "summary.txt"), toGenSummaryOfByEventEvent, toGenSummaryOfByEventTime, toGenSummaryOfByEventMsgCnt)
 		// Calc used time.
 		usedTime := time.Now().UnixMilli() - startTime
-		LogInfoln(fmt.Sprintf("Update #%d done. Processed %d records. Used %d ms.", totUpd+1, processed, usedTime))
+		LogInfoln(fmt.Sprintf("Update #%d done. Processed %d records, %d registration request, registered %d beacons. Used %d ms.", totUpd+1, processed, totRegRequests, reged, usedTime))
 		if usedTime > 5000 {
 			LogWarnln("The program is running too slow. Check your DB, or the location of your tmp dir.")
 		}

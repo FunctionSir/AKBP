@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:07:34
- * @LastEditTime: 2024-09-22 11:55:30
+ * @LastEditTime: 2024-10-07 18:07:40
  * @LastEditors: FunctionSir
  * @Description: AKBP Server, main file.
  * @FilePath: /AKBP/server/main.go
@@ -82,6 +82,54 @@ func pong(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
 
+func srvToSrvExchange() {
+	for {
+		LogInfoln("Started server to server records exchange.")
+		// If no valid server ID or no known server, do not exchange.
+		if ServerId == "" || KnownServers == nil {
+			return
+		}
+		rows := QueryRecs()
+		for rows.Next() {
+			var bid string
+			var eid string
+			var ts int
+			var msg string
+			var banned string
+			rows.Scan(&bid, &eid, &ts, &msg, &banned)
+			notForwardTo := strings.Split(banned, ",")
+			// Make a new header.
+			newHeader := make(http.Header)
+			newHeader.Set(KEY_AKBP_TTL, strconv.Itoa(ADD_TTL))
+			// Set type and server ID info.
+			newHeader.Set(KEY_AKBP_MSG_TYPE, "forwarded")
+			newHeader.Set(KEY_AKBP_SERVER_ID, ServerId)
+			newHeader.Set(KEY_AKBP_DO_NOT_FORWARD_TO, banned)
+			// BID, EID, TS
+			newHeader.Set(KEY_AKBP_BEACON_ID, bid)
+			newHeader.Set(KEY_AKBP_EVENT_ID, eid)
+			newHeader.Set(KEY_AKBP_TIMESTAMP, strconv.Itoa(ts))
+			// Encoded msg here.
+			encodedMsg := url.QueryEscape(msg)
+			newKv := map[string]string{"msg": encodedMsg}
+			// Range known servers.
+			for k, v := range KnownServers {
+				// If the server is contained in notForwardTo.
+				if slices.Contains(notForwardTo, k) {
+					continue
+				}
+				// Set new auth info.
+				newHeader.Set(KEY_AKBP_AUTH, KeysForAuth[k])
+				// Post it!
+				doPost(v, &newHeader, &newKv)
+			}
+		}
+		LogInfoln("Successfully done once server to server records exchange.")
+		// Sit back and relax.
+		time.Sleep(time.Duration(ExchangeGap) * time.Second)
+	}
+}
+
 func srvToSrvForward(c *gin.Context) {
 	// If no valid server ID or no known server, do not forward.
 	if ServerId == "" || KnownServers == nil {
@@ -136,7 +184,7 @@ func srvToSrvForward(c *gin.Context) {
 func beaconReportHandler(c *gin.Context) {
 	// Get beacon ID.
 	bid := c.GetHeader(KEY_AKBP_BEACON_ID)
-	if len(bid) == 0 || !ChkStrNoExit(&bid) {
+	if len(bid) == 0 || !ChkStrNoExit(&bid, "@.") || len(bid) > 32 {
 		c.Header(KEY_AKBP_MSG_TYPE, "error")
 		c.String(http.StatusBadRequest, ERR_WRONG_BEACON_ID_OR_AUTH_INFO)
 		return
@@ -173,7 +221,13 @@ func beaconReportHandler(c *gin.Context) {
 			return
 		}
 		// Add new record.
-		if AddRecord(bid, eid, ts, c.PostForm("msg"), STR_BEACON+"-"+bid) {
+		tmp := strings.Split(c.GetHeader(KEY_AKBP_DO_NOT_FORWARD_TO), ",")
+		notForwardTo := ""
+		for _, x := range tmp {
+			notForwardTo += strings.TrimSpace(x) + ","
+		}
+		notForwardTo += ServerId
+		if AddRecord(bid, eid, ts, c.PostForm("msg"), STR_BEACON+"-"+bid, notForwardTo) {
 			// Forward.
 			srvToSrvForward(c)
 		}
@@ -188,7 +242,7 @@ func beaconReportHandler(c *gin.Context) {
 func fromServerHandler(c *gin.Context) {
 	sid := c.GetHeader(KEY_AKBP_SERVER_ID)
 	key := c.GetHeader(KEY_AKBP_AUTH)
-	if !AuthOK(TABLE_SERVERS, sid, key) {
+	if !ChkStrNoExit(&sid, "") || len(sid) > 16 || !AuthOK(TABLE_SERVERS, sid, key) {
 		return
 	}
 	msgType := c.GetHeader(KEY_AKBP_MSG_TYPE)
@@ -201,10 +255,16 @@ func fromServerHandler(c *gin.Context) {
 		tsStr := c.GetHeader(KEY_AKBP_TIMESTAMP)
 		tsInt, err := strconv.Atoi(tsStr)
 		msg := c.PostForm("msg")
-		if bid == "" || eid == "" || tsStr == "" || err != nil || !ChkStrNoExit(&sid) || !ChkStrNoExit(&bid) {
+		if bid == "" || eid == "" || tsStr == "" || err != nil || (!ChkStrNoExit(&bid, "@.")) || len(bid) > 32 {
 			return
 		}
-		if AddRecord(bid, eid, tsInt, msg, STR_SERVER+"-"+sid) {
+		tmp := strings.Split(c.GetHeader(KEY_AKBP_DO_NOT_FORWARD_TO), ",")
+		notForwardTo := ""
+		for _, x := range tmp {
+			notForwardTo += strings.TrimSpace(x) + ","
+		}
+		notForwardTo += ServerId
+		if AddRecord(bid, eid, tsInt, msg, STR_SERVER+"-"+sid, notForwardTo) {
 			srvToSrvForward(c)
 		}
 		reportOk(c)
@@ -263,6 +323,9 @@ func main() {
 
 	// From-Server //
 	ginEng.POST("/from-server", fromServerHandler)
+
+	// Start Server To Server Exchange //
+	go srvToSrvExchange()
 
 	LogInfoln("Everything is OK, ready to start the HTTP(S) service.")
 	ginEng.Run(Addr)

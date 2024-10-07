@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 21:33:33
- * @LastEditTime: 2024-10-03 22:28:45
+ * @LastEditTime: 2024-10-06 19:42:51
  * @LastEditors: FunctionSir
  * @Description: DB related.
  * @FilePath: /AKBP/midware-dokuwiki/db.go
@@ -11,15 +11,22 @@
 package main
 
 import (
+	"crypto/sha512"
 	"database/sql"
+	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // '0'~'9', 'A'~'Z', '_', 'a'~'z' are considered as safe chars.
 func chrIsSafe(ch rune) bool {
 	return strings.ContainsRune("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz", ch)
+}
+
+func CalcHash(key string, salt string) string {
+	return fmt.Sprintf("%X", sha512.Sum512([]byte(key+salt)))
 }
 
 // A kind of protection before SQL actions.
@@ -69,4 +76,39 @@ func QueryRecs() *sql.Rows {
 		return nil
 	}
 	return rows
+}
+
+func IsBidExists(bid string) bool {
+	db := DbOpen()
+	defer db.Close()
+	stmt := DbPrepare(db, "SELECT ROWID FROM BEACONS WHERE ID=?")
+	var tmp int
+	err := stmt.QueryRow(bid).Scan(&tmp)
+	return err == nil
+}
+
+func IsSaltExists(salt string) bool {
+	db := DbOpen()
+	defer db.Close()
+	stmt := DbPrepare(db, "SELECT * FROM BEACONS WHERE SALT=?")
+	err := stmt.QueryRow(salt)
+	return err == nil
+}
+
+func RegBeacon(bid string, key string, note string) bool {
+	db := DbOpen()
+	defer db.Close()
+	stmt := DbPrepare(db, "INSERT INTO BEACONS VALUES(?,?,?,?)")
+	salt := GenSalt()
+	hash := CalcHash(key, salt)
+	_, err := stmt.Exec(bid, salt, hash, note)
+	return err == nil
+}
+
+func GenSalt() string {
+	salt := uuid.New().String()
+	for IsSaltExists(salt) {
+		salt = uuid.New().String()
+	}
+	return salt
 }

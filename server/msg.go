@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 21:18:18
- * @LastEditTime: 2024-09-22 01:15:13
+ * @LastEditTime: 2024-10-07 17:46:45
  * @LastEditors: FunctionSir
  * @Description: Beacons related.
  * @FilePath: /AKBP/server/msg.go
@@ -29,15 +29,18 @@ func MsgExists(bid string, eid string, ts int, msg string) bool {
 	return err == nil
 }
 
-func AddRecord(bid string, eid string, ts int, msg string, origin string) bool {
+func AddRecord(bid string, eid string, ts int, msg string, origin string, banned string) bool {
 	// If msg exists, do nothing.
 	if MsgExists(bid, eid, ts, msg) {
 		return false
 	}
 	db := DbOpen()
 	defer db.Close()
-	stmt := DbPrepare(db, "INSERT INTO RECORDS VALUES(?,?,?,?,?)")
-	stmt.Exec(bid, eid, ts, msg, origin)
+	stmt := DbPrepare(db, "INSERT INTO RECORDS VALUES(?,?,?,?,?,?)")
+	_, err := stmt.Exec(bid, eid, ts, msg, origin, banned)
+	if err != nil {
+		return false
+	}
 	stmt = DbPrepare(db, "INSERT INTO RECEIVED VALUES(?)")
 	stmt.Exec(CalcMsgHash(bid, eid, ts, msg))
 	return true

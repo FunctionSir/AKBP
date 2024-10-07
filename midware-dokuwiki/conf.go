@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 00:23:17
- * @LastEditTime: 2024-10-04 22:38:01
+ * @LastEditTime: 2024-10-07 17:01:53
  * @LastEditors: FunctionSir
  * @Description: Config related.
  * @FilePath: /AKBP/midware-dokuwiki/conf.go
@@ -74,5 +74,16 @@ func LoadConf() {
 		KmlsNs = section.Key("NsForKmls").String()
 	} else {
 		LogWarnln("Seems like you didn't specify the namespace linked to tmpdir/dw-m/kmls, use the default one.")
+	}
+	if !section.HasKey("Domain") {
+		LogFatalln("You need to specify your domain.")
+	}
+	Domain = strings.TrimSpace(section.Key("Domain").String())
+	if !section.HasKey("UsersDir") {
+		LogFatalln("You need to specify where is users' dir.")
+	}
+	UsersDir = strings.TrimSpace(section.Key("UsersDir").String())
+	if !DirExists(UsersDir) {
+		LogFatalln("Users' dir not exists or it is not a dir.")
 	}
 }

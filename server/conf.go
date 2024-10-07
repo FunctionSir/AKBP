@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-14 00:23:17
- * @LastEditTime: 2024-09-22 01:42:23
+ * @LastEditTime: 2024-10-07 17:02:03
  * @LastEditors: FunctionSir
  * @Description: Config related.
  * @FilePath: /AKBP/server/conf.go
@@ -11,6 +11,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 
 	"gopkg.in/ini.v1"
@@ -37,6 +38,12 @@ func LoadConf() {
 	}
 	if section.HasKey("MainDB") {
 		Db = section.Key("MainDB").String()
+	}
+	if section.HasKey("ExchangeGap") {
+		ExchangeGap, err = strconv.Atoi(section.Key("ExchangeGap").String())
+		if err != nil {
+			LogFatalln("Can not covert value of key \"ExchangeGap\" to int.")
+		}
 	}
 	if conf.HasSection("known-servers") {
 		KnownServers = make(map[string]string)
