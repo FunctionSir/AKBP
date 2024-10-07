@@ -1,7 +1,7 @@
 <!--
  * @Author: FunctionSir
  * @Date: 2023-07-14 23:10:45
- * @LastEditTime: 2024-10-07 18:42:58
+ * @LastEditTime: 2024-10-07 18:49:13
  * @LastEditors: FunctionSir
  * @Description: [A]nti [K]idnapping [B]eacon [P]roject
  * @FilePath: /AKBP/README.md
@@ -18,8 +18,8 @@ Anti Kidnapping Beacon Project是受国际搜救卫星组织的信标启发的, 
 
 ## 约束
 
-Server ID只允许含有A~Z,a~z,0~9,以及下划线_, 且不得超过16个字符.  
-Beacon ID只允许含有A~Z,a~z,0~9,以及下划线_, 以及用于标识来源服务器的@和点号(.), 且不得超过32个字符.  
+Server ID只允许含有A\~Z,a\~z,0\~9,以及下划线\_, 且不得超过16个字符.  
+Beacon ID只允许含有A\~Z,a\~z,0\~9,以及下划线\_, 以及用于标识来源服务器的@和点号(.), 且不得超过32个字符.  
 要想在DW即可解密加密信息, 那么加密方式只能为"aes-256-cbc-pbkdf2".  
 
 ## 为什么有了这个项目? 以及其他
