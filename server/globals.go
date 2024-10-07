@@ -2,7 +2,7 @@
  * @Author: FunctionSir
  * @License: AGPLv3
  * @Date: 2024-09-12 22:19:36
- * @LastEditTime: 2024-10-07 16:52:22
+ * @LastEditTime: 2024-10-07 18:45:53
  * @LastEditors: FunctionSir
  * @Description: Global consts and vars.
  * @FilePath: /AKBP/server/globals.go
@@ -23,7 +23,7 @@ const (
 	DEFAULT_ADDR         string = "127.0.0.1:4060" // Default listening address.
 	DEFAULT_DB           string = "akbp.db"        // Default DB.
 	DEFAULT_SID          string = ""               // Default server ID.
-	DEFAULT_EXCHANGE_GAP int    = 10               // Default exchange gap.
+	DEFAULT_EXCHANGE_GAP int    = 3600             // Default exchange gap.
 )
 
 // COMMON CONSTS //
