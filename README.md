@@ -11,7 +11,7 @@
 
 Anti Kidnapping Beacon Project是受国际搜救卫星组织的信标启发的, 可用智能手机或其他可直接或间接连接到互联网的硬件作为信标的, 可自行架设服务器的, 反对绑架/虐待型"教育学校/矫正学校"的项目.  
 愿每个人都可以不受绑架及虐待!  
-姊妹项目: [PanDefenseProject](https://github.com/FunctionSir/PanDefenseProject)  
+本项目的姊妹项目: [PanDefenseProject](https://github.com/FunctionSir/PanDefenseProject).  
 
 ## 务必注意
 
